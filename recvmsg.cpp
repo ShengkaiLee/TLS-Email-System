@@ -23,7 +23,6 @@ using namespace std;
  */
 static char const *CACert = "../ca/intermediate/certs/ca-chain.cert.pem";
 static int padding = RSA_PKCS1_OAEP_PADDING;
-static int flen    = 40;
 static void die(const char *msg)
 {
     perror(msg);
@@ -104,7 +103,6 @@ int main(int argc, char **argv)
 	BIO *in_sign = NULL;
 	EVP_PKEY *skey = NULL;
 	X509 *scert = NULL;
-	CMS_ContentInfo *cms = NULL;
 	BIO *out_sign = NULL;
 
 	int err; string s;
@@ -202,7 +200,8 @@ int main(int argc, char **argv)
 	SSL_write(ssl, decrypt_msg, strlen(decrypt_msg));
 	//read number of msgs
 	char num_msg[10];
-	SSL_read(ssl, num_msg, sizeof(num_msg));
+	int num_bytes = SSL_read(ssl, num_msg, sizeof(num_msg));
+	num_msg[num_bytes] = '\0';
 	int num = atoi(num_msg);
 	// verify and decrpt
 	for (int i = 0; i < num; i++)
@@ -213,7 +212,7 @@ int main(int argc, char **argv)
 		CMS_ContentInfo *cms = NULL;
 		st = X509_STORE_new();
 		char certBuf[2560];
-		int cert_bytes = SSL_read(ssl, certBuf, sizeof(certBuf));
+		SSL_read(ssl, certBuf, sizeof(certBuf));
 		//tbio = BIO_new(BIO_s_mem());
 		//BIO_write(tbio, certBuf, cert_bytes + 1);
 		tbio = BIO_new_file("../ca/intermediate/certs/cacert.pem", "r");

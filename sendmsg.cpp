@@ -23,7 +23,6 @@ using namespace std;
  */
 static char const *CACert = "../ca/intermediate/certs/ca-chain.cert.pem";
 static int padding = RSA_PKCS1_OAEP_PADDING;
-static int flen    = 40;
 static void die(const char *msg)
 {
     perror(msg);
@@ -113,8 +112,6 @@ int main(int argc, char **argv)
 	RSA *rsa_pubkey = NULL;
 	BIO *in_sign = NULL;
 	EVP_PKEY *skey = NULL;
-	X509 *scert = NULL;
-	CMS_ContentInfo *cms = NULL;
 	BIO *out_sign = NULL;
 
 	int err; string s;
@@ -215,7 +212,6 @@ int main(int argc, char **argv)
 	int numOfrcpt = argc - 4;
 	char certBuf[numOfrcpt][2560];
 	int cert_size[numOfrcpt];
-	char *temp = "test test test";
 	for (int i = 0; i < numOfrcpt; i++)
 	{
 		int bytes = SSL_read(ssl, certBuf[i], sizeof(certBuf[i]));
@@ -229,8 +225,6 @@ int main(int argc, char **argv)
 		die("msg size > 2000 bytes");
 	}
 	const char *msg = msg_content.c_str();
-	char EncMsg[numOfrcpt][2560];
-	int  enc_size[numOfrcpt];
 	for (int i = 0; i < numOfrcpt; i++)
 	{	
 		int flags1 = CMS_STREAM;
@@ -240,7 +234,6 @@ int main(int argc, char **argv)
 		BIO *in1 = NULL, *out1 = NULL;
    	 	STACK_OF(X509) *recips = NULL;
     	CMS_ContentInfo *cms1 = NULL;
-    	int ret = 1;
 		recips = sk_X509_new_null();
 		sk_X509_push(recips, certificate);
 		in1 = BIO_new(BIO_s_mem());
