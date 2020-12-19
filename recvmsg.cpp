@@ -275,6 +275,10 @@ int main(int argc, char **argv)
 		BIO *out_enc = BIO_new_file(store_path.c_str(), "w");
 		CMS_decrypt(cms_enc, rkey, rcert, NULL, out_enc, 0);
 		remove("verify.txt");
+		fclose(fp_cert);
+		BIO_free(in_enc);
+		BIO_free(out_enc);
+		CMS_ContentInfo_free(cms_enc);
 	}
 	SSL_free(ssl);
 	SSL_CTX_free(ctx);;
