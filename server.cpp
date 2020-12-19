@@ -32,13 +32,14 @@ static void die(const char *msg)
     exit(1);
 }
 
-static void send_certificate(SSL *ssl, const char* path)
+static int send_certificate(SSL *ssl, const char* path)
 {
 	FILE *fp = NULL;
 	fp = fopen(path, "rb");
 	if (fp == 0)
 	{
 		cout<<"fopen failed to open "<<path<<endl;
+		return 0;
 	}
 	fseek(fp, 0, SEEK_END);
 	size_t size = ftell (fp);
@@ -52,11 +53,13 @@ static void send_certificate(SSL *ssl, const char* path)
 	if (fread(buf, 1, size, fp) != size)
 	{
 		cout<<"fread failed"<<endl;
+		return 0;
 	}
 	SSL_write(ssl, buf, size);
 	//BIO_flush(ssl);
 	fclose(fp);
 	free(buf);
+	return 1;
 }
 
 int main(int argc, char *argv[])
@@ -302,7 +305,12 @@ int main(int argc, char *argv[])
 		    char path[1000]; 
 		    sprintf(path, "../ca/intermediate/certs/www.%s.com.cert.pem", rcpt_name[i]);
 		    //printf("path: %s\n", path);
-		    send_certificate(ssl, path);
+		    //send_certificate(ssl, path);
+		    if(send_certificate(ssl, path) == 0)
+		    {
+			    //SSL_shutdown(ssl);
+			    die("error occurs. recipient does not exist");
+		    }
 	    }
 	    
 	    // save message to mailbox
@@ -316,6 +324,11 @@ int main(int argc, char *argv[])
 		    rcptfp = fopen(mail_path, "wb"); 
 		    char read4_buf[25600];
 		    int read4 = SSL_read(ssl, read4_buf, sizeof(read4_buf));
+		    if (rcptfp == 0)
+		    {
+			    //SSL_shutdown(ssl);
+			    die("failed to open the recipient's mail box. recipient does not exist");
+		    }
 		    if(fwrite(read4_buf, 1, read4, rcptfp) != (size_t)read4)
 		    {
 			    cout<<"fwrite for "<<rcpt_name[i]<<" failed"<<endl;
