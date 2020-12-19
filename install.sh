@@ -13,5 +13,5 @@ cp 00003 project/input
 cp server project/bin
 cp sendmsg project/bin
 cp recvmsg project/bin
-cp signer.pem project/bin
-cp cacert.pem project/bin
+cp signer.pem project/ca/intermediate/certs
+cp cacert.pem project/ca/intermediate/certs

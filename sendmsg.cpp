@@ -75,10 +75,10 @@ static void send_certificate(SSL *ssl, const char* path)
 
 int main(int argc, char **argv)
 {   
-	/* ./sendmsg localhost 8888 username message rcpt1 rcpt2 rcpt3 */
-    if (argc < 6)
+	/* ./sendmsg localhost 8888 username rcpt1 rcpt2 rcpt3 */
+    if (argc <5)
     {
-    	//die("./sendmsg localhost 8888 username rcpt1 rcpt2 rcpt3");
+    	die("./sendmsg localhost 8888 username rcpt1 rcpt2 rcpt3");
 	}	
     char *hostName = argv[1];
     int portNum  = atoi(argv[2]);
@@ -226,32 +226,11 @@ int main(int argc, char **argv)
     std::string msg_content(begin, end);
 	if(msg_content.size() > 2000)
 	{
-		//die("msg size > 2000 bytes");
+		die("msg size > 2000 bytes");
 	}
 	const char *msg = msg_content.c_str();
 	char EncMsg[numOfrcpt][2560];
 	int  enc_size[numOfrcpt];
-	/*
-	for (int i = 0; i < numOfrcpt; i++)
-	{	
-		BIO *bio_enc = BIO_new(BIO_s_mem());
-		BIO_write(bio_enc, certBuf[i], cert_size[i]+1);
-		X509 *certificate = PEM_read_bio_X509(bio_enc, NULL, NULL, NULL);
-		if (certificate == NULL)
-		{
-			cerr << "certificate in NULL\n";
-			continue;
-		}
-		EVP_PKEY *pubkey = X509_get_pubkey(certificate);
-		RSA *rsa_pubkey = EVP_PKEY_get1_RSA(pubkey);
-		int bytes = RSA_public_encrypt(25, (const unsigned char *)temp, (unsigned char *)EncMsg[i], rsa_pubkey, padding);
-		enc_size[i] = bytes;
-		BIO_free(bio_enc);
-		X509_free(certificate);
-		EVP_PKEY_free(pubkey);
-		RSA_free(rsa_pubkey);
-	}
-	*/
 	for (int i = 0; i < numOfrcpt; i++)
 	{	
 		int flags1 = CMS_STREAM;
@@ -284,7 +263,7 @@ int main(int argc, char **argv)
 		int flags = CMS_DETACHED | CMS_STREAM;
 		string cipher_path = "cipher" + to_string(i) + ".txt";
 		BIO *in_sign = BIO_new_file(cipher_path.c_str(), "rb");
-		BIO *tbio = BIO_new_file("signer.pem", "r");
+		BIO *tbio = BIO_new_file("../ca/intermediate/certs/signer.pem", "r");
 		X509 *scert = PEM_read_bio_X509(tbio, NULL, 0, NULL);
 		BIO_reset(tbio);
 		EVP_PKEY *skey =  PEM_read_bio_PrivateKey(tbio, NULL, 0, NULL);
@@ -315,7 +294,6 @@ int main(int argc, char **argv)
 		}
 		fseek(fp_sign, 0, SEEK_END);
 		size_t size = ftell (fp_sign);
-		printf("%ld\n", size);
 		rewind(fp_sign);
 		if (fread(output, 1, size, fp_sign) != size)
 		{
@@ -323,8 +301,8 @@ int main(int argc, char **argv)
 		}
 		fclose(fp_sign);
 		SSL_write(ssl, output, size);
-		//remove("cipher.txt");
-		//remove("sign_out.txt");
+		remove(cipher_path.c_str());
+		remove("sign_out.txt");
 	}
 	
 	SSL_free(ssl);

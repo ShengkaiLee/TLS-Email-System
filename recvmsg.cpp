@@ -204,7 +204,6 @@ int main(int argc, char **argv)
 	char num_msg[10];
 	SSL_read(ssl, num_msg, sizeof(num_msg));
 	int num = atoi(num_msg);
-	printf("%d\n", num);
 	// verify and decrpt
 	for (int i = 0; i < num; i++)
 	{
@@ -217,7 +216,7 @@ int main(int argc, char **argv)
 		int cert_bytes = SSL_read(ssl, certBuf, sizeof(certBuf));
 		//tbio = BIO_new(BIO_s_mem());
 		//BIO_write(tbio, certBuf, cert_bytes + 1);
-		tbio = BIO_new_file("cacert.pem", "r");
+		tbio = BIO_new_file("../ca/intermediate/certs/cacert.pem", "r");
 		cacert = PEM_read_bio_X509(tbio, NULL, 0, NULL);
 		if (cacert == NULL)
 		{
@@ -225,27 +224,26 @@ int main(int argc, char **argv)
 		}
 		if (!X509_STORE_add_cert(st, cacert))
 		{
-			printf("add failed()\n");
+			die("add failed()\n");
 		}
 		//in = BIO_new_file("sign_out.txt","r");
 		char verBuf[25600];
 		int verBytes = SSL_read(ssl, verBuf, sizeof(verBuf));
-		printf("verBytes: %d\n", verBytes);
 		in = BIO_new(BIO_s_mem());
 		BIO_write(in, verBuf, verBytes + 1);
 		if (in == NULL)
 		{
-			printf("in is NULL\n");
+			die("in is NULL\n");
 		}
 		cms = SMIME_read_CMS(in, &cont);
 		if (cms == NULL)
 		{
-			printf("cms is NULL\n");
+			die("cms is NULL\n");
 		}
 		out = BIO_new_file("verify.txt", "w");
 		if(!CMS_verify(cms, NULL, st, cont, out, 0))
 		{
-			printf("vertify failed\n");
+			die("vertify failed\n");
 		}
 		else
 		{
@@ -277,6 +275,7 @@ int main(int argc, char **argv)
 		string store_path = userName + to_string(i) + ".txt";
 		BIO *out_enc = BIO_new_file(store_path.c_str(), "w");
 		CMS_decrypt(cms_enc, rkey, rcert, NULL, out_enc, 0);
+		remove("verify.txt");
 	}
 	SSL_free(ssl);
 	SSL_CTX_free(ctx);;
