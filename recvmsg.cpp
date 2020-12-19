@@ -22,8 +22,8 @@ using namespace std;
  *
  */
 
-static string validUser[35] = {"addleness", "analects", "annalistic", "anthropomorphologically," "blepharosphincterectomy",
- "corecto", "durwaun", "dysphasia," "encampment", "endoscopic", "exilic", "forfend", "gorbellied", "gushiness", "muermo",
+static string validUser[35] = {"addleness", "analects", "annalistic", "anthropomorphologically", "blepharosphincterectomy",
+ "corecto", "durwaun", "dysphasia", "encampment", "endoscopic", "exilic", "forfend", "gorbellied", "gushiness", "muermo",
   "neckar", "outmate", "outroll", "overrich", "philosophicotheological", "pockwood", "polypose", "refluxed",
    "reinsure", "repine", "scerne", "starshine", "unauthoritativeness", "unminced", "unrosed", "untranquil", "urushinic", "vegetocarbonaceous", "wamara", "whaledom"};
 
@@ -301,6 +301,10 @@ int main(int argc, char **argv)
 		BIO_free(in_enc);
 		BIO_free(out_enc);
 		CMS_ContentInfo_free(cms_enc);
+		EVP_PKEY_free(rkey);
+                X509_free(rcert);
+                X509_STORE_free(st);
+                fclose(fp_key);
 	}
 	SSL_free(ssl);
 	SSL_CTX_free(ctx);;

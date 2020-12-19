@@ -71,8 +71,8 @@ static void send_certificate(SSL *ssl, const char* path)
 	fclose(fp);
 	free(buf);
 }
-static string validUser[35] = {"addleness", "analects", "annalistic", "anthropomorphologically," "blepharosphincterectomy",
- "corecto", "durwaun", "dysphasia," "encampment", "endoscopic", "exilic", "forfend", "gorbellied", "gushiness", "muermo",
+static string validUser[35] = {"addleness", "analects", "annalistic", "anthropomorphologically", "blepharosphincterectomy",
+ "corecto", "durwaun", "dysphasia", "encampment", "endoscopic", "exilic", "forfend", "gorbellied", "gushiness", "muermo",
   "neckar", "outmate", "outroll", "overrich", "philosophicotheological", "pockwood", "polypose", "refluxed",
    "reinsure", "repine", "scerne", "starshine", "unauthoritativeness", "unminced", "unrosed", "untranquil", "urushinic", "vegetocarbonaceous", "wamara", "whaledom"};
 
