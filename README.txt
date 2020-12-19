@@ -14,7 +14,9 @@ Enviornment Requirments:
         3. sudo apt install openssl
 
 Set up:
+===============================================================================================================================
      RUN "bash install.sh" or "./install.sh" will set up everything for you.
+===============================================================================================================================
 
 File Layout:
     After successfully runing "bash install.sh", a directory called 'project' will be generated under the current directory.
