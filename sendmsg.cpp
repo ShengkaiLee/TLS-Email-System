@@ -252,7 +252,7 @@ int main(int argc, char **argv)
 		if(cms1 == NULL)
 			printf("NULL\n");
 		CMS_ContentInfo_free(cms1);
-    	X509_free(certificate);
+    	//X509_free(certificate);
     	sk_X509_pop_free(recips, X509_free);
     	BIO_free(in1);
     	BIO_free(out1);
