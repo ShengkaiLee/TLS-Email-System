@@ -21,6 +21,24 @@ using namespace std;
  * Compile with -lssl -lcrypto
  *
  */
+
+static string validUser[35] = {"addleness", "analects", "annalistic", "anthropomorphologically," "blepharosphincterectomy",
+ "corecto", "durwaun", "dysphasia," "encampment", "endoscopic", "exilic", "forfend", "gorbellied", "gushiness", "muermo",
+  "neckar", "outmate", "outroll", "overrich", "philosophicotheological", "pockwood", "polypose", "refluxed",
+   "reinsure", "repine", "scerne", "starshine", "unauthoritativeness", "unminced", "unrosed", "untranquil", "urushinic", "vegetocarbonaceous", "wamara", "whaledom"};
+
+static bool my_find(string str)
+{
+	for (int i = 0; i < 35; i++)
+	{
+		if(str == validUser[i])
+		{
+			return 1;
+		}
+	}
+	return 0;
+}
+
 static char const *CACert = "../ca/intermediate/certs/ca-chain.cert.pem";
 static int padding = RSA_PKCS1_OAEP_PADDING;
 static void die(const char *msg)
@@ -82,6 +100,10 @@ int main(int argc, char **argv)
     char *hostName = argv[1];
     int portNum  = atoi(argv[2]);
 	string userName = argv[3];
+	if(my_find(userName) == 0)
+	{
+		die("wrong userName");
+	}
 	string funcName_temp = "recvmsg()";
 	const char *funcName = funcName_temp.c_str();
 	string CertFile_temp = "../ca/intermediate/certs/www."+userName+ ".com.cert.pem";

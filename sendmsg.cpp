@@ -71,7 +71,22 @@ static void send_certificate(SSL *ssl, const char* path)
 	fclose(fp);
 	free(buf);
 }
+static string validUser[35] = {"addleness", "analects", "annalistic", "anthropomorphologically," "blepharosphincterectomy",
+ "corecto", "durwaun", "dysphasia," "encampment", "endoscopic", "exilic", "forfend", "gorbellied", "gushiness", "muermo",
+  "neckar", "outmate", "outroll", "overrich", "philosophicotheological", "pockwood", "polypose", "refluxed",
+   "reinsure", "repine", "scerne", "starshine", "unauthoritativeness", "unminced", "unrosed", "untranquil", "urushinic", "vegetocarbonaceous", "wamara", "whaledom"};
 
+static bool my_find(string str)
+{
+	for (int i = 0; i < 35; i++)
+	{
+		if(str == validUser[i])
+		{
+			return 1;
+		}
+	}
+	return 0;
+}
 int main(int argc, char **argv)
 {   
 	/* ./sendmsg localhost 8888 username rcpt1 rcpt2 rcpt3 */
@@ -82,6 +97,10 @@ int main(int argc, char **argv)
     char *hostName = argv[1];
     int portNum  = atoi(argv[2]);
 	string userName = argv[3];
+	if (my_find(userName)==0)
+	{
+		die("wrong username");
+	}
 	string funcName_temp = "sendmsg()";
 	const char *funcName = funcName_temp.c_str();
 	string CertFile_temp = "../ca/intermediate/certs/www."+userName+ ".com.cert.pem";
@@ -91,7 +110,11 @@ int main(int argc, char **argv)
 	//prepare "username recpt1 recpt2 recpt3"
 	string user_rcpt_tmp = "";
 	for (int i = 4; i < argc; i++)
-	{
+	{	
+		if (my_find(argv[i]) == 0)
+		{
+			die("wrong recipients");
+		}
 		user_rcpt_tmp += argv[i];
 		if(i != argc -1)
 		{
