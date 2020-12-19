@@ -225,7 +225,7 @@ int main(int argc, char *argv[])
 	    //
 	    string username = string(sendername);
 	    string CertFile_temp = "../ca/intermediate/certs/www."+username+ ".com.cert.pem";
-	    cout<<"certfile path"<<CertFile_temp<<endl;
+	    //cout<<"certfile path"<<CertFile_temp<<endl;
 	    const char *CertFile = CertFile_temp.c_str();
 	    // verify clinet's cert
     		// 
@@ -271,7 +271,8 @@ int main(int argc, char *argv[])
 	    //
 	    //generate encrypt_msg
    	    const char *test_msg = "hahaha";
-    	char encrypt_msg[2560];
+    	    //char *encrypt_msg = (char*) malloc (2560);
+	    char encrypt_msg[2560];
     	auto rsa = EVP_PKEY_get1_RSA(pubkey);
     	int enc = RSA_public_encrypt(flen, (const unsigned char *)test_msg, (unsigned char *)encrypt_msg, rsa, padding);
     	//printf("%s\n", encrypt_msg);
@@ -323,6 +324,7 @@ int main(int argc, char *argv[])
 	    }
 	    //fclose(rcptfp);
 	    RSA_free(rsa);
+	    //free(encrypt_msg);
     }
     else
     {
@@ -337,6 +339,7 @@ int main(int argc, char *argv[])
         //send encrpted message
         const char *test_msg = "hahaha";
     	char encrypt_msg[2560];
+	//char *encrypt_msg = (char*)malloc(2560);
     	auto rsa = EVP_PKEY_get1_RSA(pubkey);
     	int enc = RSA_public_encrypt(flen, (const unsigned char *)test_msg, (unsigned char *)encrypt_msg, rsa, padding);
     	//printf("%s\n", encrypt_msg);
@@ -364,7 +367,7 @@ int main(int argc, char *argv[])
         
         //Not real implementation, just for testing
         char recv_path[1000];
-        //sprintf(recv_path, "../mailbox/%s", recv_user);
+        sprintf(recv_path, "../mailbox/%s", recv_user);
         DIR *d;
         struct dirent *dir;
         d = opendir(recv_path);
@@ -430,6 +433,7 @@ int main(int argc, char *argv[])
             }
             closedir(d2);
         }
+	//free(encrypt_msg);
         RSA_free(rsa);
     }
     /*
