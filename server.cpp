@@ -23,7 +23,7 @@ using namespace std;
 static char const *CertFile = "../ca/intermediate/certs/www.server.com.cert.pem";
 static char const *KeyFile = "../ca/intermediate/private/www.server.com.key.pem";
 static char const *CACert = "../ca/intermediate/certs/ca-chain.cert.pem";
-static char const *client_ca_path = "../ca/intermediate/certs";
+//static char const *client_ca_path = "../ca/intermediate/certs";
 static int padding = RSA_PKCS1_OAEP_PADDING;
 static int flen    = 40;
 static void die(const char *msg)
@@ -41,7 +41,7 @@ static void send_certificate(SSL *ssl, const char* path)
 		cout<<"fopen failed to open "<<path<<endl;
 	}
 	fseek(fp, 0, SEEK_END);
-	long size = ftell (fp);
+	size_t size = ftell (fp);
 	rewind(fp);
 	char *buf = (char*) malloc (sizeof(char) * size);
 	if (buf == NULL)
@@ -131,11 +131,11 @@ int main(int argc, char *argv[])
     fprintf(stderr, "\nconnection started from: %s\n", inet_ntoa(client_addr.sin_addr));
     SSL_set_fd(ssl, clientSock);
     err = SSL_accept(ssl);
-    cout << "err: " << err << endl;
+    //cout << "err: " << err << endl;
 
     if (SSL_get_peer_certificate(ssl) == NULL)
     {
-        printf("peer_certificate = NULL\n");
+        //printf("peer_certificate = NULL\n");
     }
     int ver_err = SSL_get_verify_result(ssl);
     {
@@ -153,7 +153,7 @@ int main(int argc, char *argv[])
     }
     if (total > 0)
     {
-        printf("Client msg: \"%s\"\n", buf);
+        //printf("Client msg: \"%s\"\n", buf);
     }
     BIO *bio;
     X509 *certificate;
@@ -164,39 +164,50 @@ int main(int argc, char *argv[])
     {
         die("Cert is NULL");
     }
-    char *line;
-    line = X509_NAME_oneline(X509_get_subject_name(certificate), 0, 0);
-    printf("Subject: %s\n", line);
-    cout << "success" << endl;
+    //char *line;
+    //line = X509_NAME_oneline(X509_get_subject_name(certificate), 0, 0);
+    //printf("Subject: %s\n", line);
+    //cout << "success" << endl;
 
+    
     // verify clinet's cert
     // 
     //X509 *selfCert = SSL_get_certificate(ssl);
-    X509* selfCert = NULL;
-    FILE *cfp = NULL;
-    cfp = fopen("../ca/intermediate/certs/www.addleness.com.cert.pem","rb");
-    if(cfp == NULL)
-    {
-        selfCert = NULL;
-        cout<<"cfp = NULL"<<endl;
-    }
-    else
-    {
-        selfCert = PEM_read_X509(cfp, NULL, NULL, NULL);
-        cout << "selfCert" << endl;
-    }
-    fclose(cfp);
+    //X509* selfCert = NULL;
+    //FILE *cfp = NULL;
+    //cfp = fopen("../ca/intermediate/certs/www.addleness.com.cert.pem","rb");
+    //if(cfp == NULL)
+    //{
+        //selfCert = NULL;
+        //cout<<"cfp = NULL"<<endl;
+    //}
+    //else
+    //{
+        //selfCert = PEM_read_X509(cfp, NULL, NULL, NULL);
+        //cout << "selfCert" << endl;
+    //}
+    //fclose(cfp);
     //cout << "selfCert" << endl;
     EVP_PKEY *pubkey = X509_get_pubkey(certificate);
-    cout << "publicKey" << endl;
+    //cout << "publicKey" << endl;
     //int result = X509_verify(certificate, pubkey);
     //cout << "result: " << result << endl;
-    int result = X509_cmp(certificate, selfCert);
-    cout << "result of X509_cmp: "<<result<<endl;
+    //int result = X509_cmp(certificate, selfCert);
+    //cout << "result of X509_cmp: "<<result<<endl;
+    /*
+    if(result != 0)
+    {
+	    die("certificate does not match");
+    }
+    */
 
     char read1_buf[10];
     // read1 = function name
     int read1 = SSL_read(ssl, read1_buf, sizeof(read1_buf));
+    if (read1 <= 0)
+    {
+	    die("SSL_read function name failed");
+    }
     if (strncmp(read1_buf, "sendmsg()", 9) == 0)
     {
 	    cout<<"sendmsg() request start"<<endl;
@@ -209,7 +220,40 @@ int main(int argc, char *argv[])
 	    read2_temp[read2]  = '\0';
 	    char *token = strtok(read2_temp, " ");
 	    char *sendername = token;
-	    cout<<"username: "<<sendername<<endl;
+	    //cout<<"username: "<<sendername<<endl;
+	    // check certificate of the sender
+	    //
+	    string username = string(sendername);
+	    string CertFile_temp = "../ca/intermediate/certs/www."+username+ ".com.cert.pem";
+	    cout<<"certfile path"<<CertFile_temp<<endl;
+	    const char *CertFile = CertFile_temp.c_str();
+	    // verify clinet's cert
+    		// 
+    		//X509 *selfCert = SSL_get_certificate(ssl);
+    		X509* selfCert = NULL;
+    		FILE *cfp = NULL;
+    		//cfp = fopen("../ca/intermediate/certs/www.addleness.com.cert.pem","rb");
+    		cfp = fopen(CertFile, "rb");
+		if(cfp == NULL)
+   		{
+       			selfCert = NULL;
+        		//cout<<"cfp = NULL"<<endl;
+    		}
+    		else
+   		 {
+ 		        selfCert = PEM_read_X509(cfp, NULL, NULL, NULL);
+        		//cout << "selfCert" << endl;
+    		}
+    		fclose(cfp);
+    		//EVP_PKEY *pubkey = X509_get_pubkey(certificate);
+    		int result = X509_cmp(certificate, selfCert);
+    		//cout << "result of X509_cmp: "<<result<<endl;
+		if (result != 0)
+		{
+			die("certificate does not match");
+		}
+		X509_free(selfCert);
+
 	    int rcpt_number = 0;
 	    vector<char*> rcpt_name;
 	    while (token != NULL)
@@ -218,27 +262,36 @@ int main(int argc, char *argv[])
 		    if (token == NULL)
 			   break; 
 		    rcpt_name.push_back(token);
-		    cout<<"token["<<rcpt_number<<"]: "<<token<<endl;
-		    cout<<"rcpt_name: " << rcpt_name[rcpt_number] << endl;
+		    //cout<<"token["<<rcpt_number<<"]: "<<token<<endl;
+		    //cout<<"rcpt_name: " << rcpt_name[rcpt_number] << endl;
 		    rcpt_number++;
 	    }
 		
 	    // send encrypted message
 	    //
 	    //generate encrypt_msg
-   	    char *test_msg = "hahaha";
+   	    const char *test_msg = "hahaha";
     	char encrypt_msg[2560];
     	auto rsa = EVP_PKEY_get1_RSA(pubkey);
     	int enc = RSA_public_encrypt(flen, (const unsigned char *)test_msg, (unsigned char *)encrypt_msg, rsa, padding);
-    	printf("%s\n", encrypt_msg);
+    	//printf("%s\n", encrypt_msg);
+	if (enc == -1)
+	{
+		die("RSA_public_encrypt failed");
+	}
     	SSL_write(ssl, encrypt_msg, sizeof(encrypt_msg));
 
 	    // verify decrypted message
 	    char read3_buf[20];
 	    int read3 = SSL_read(ssl, read3_buf, sizeof(read3_buf));
-	    if (strncmp(test_msg, read3_buf, sizeof(test_msg)) != 0)
+	    if (read3 <= 0)
 	    {
-		    cout<<"wrong decrypted message, invalid user"<<endl;
+		    die("read dedcrypted message from client failed");
+	    }
+	    if (strncmp(test_msg, read3_buf, sizeof(*test_msg)) != 0)
+	    {
+		    //cout<<"wrong decrypted message, invalid user"<<endl;
+		    die("wrong decrypted message, invalid user");
 	    }
 	    
 	    // send cert
@@ -247,25 +300,29 @@ int main(int argc, char *argv[])
             	    //FILE *rcptfp = NULL;
 		    char path[1000]; 
 		    sprintf(path, "../ca/intermediate/certs/www.%s.com.cert.pem", rcpt_name[i]);
-		    printf("path: %s\n", path);
+		    //printf("path: %s\n", path);
 		    send_certificate(ssl, path);
 	    }
 	    
 	    // save message to mailbox
+	    //FILE *rcptfp = NULL;
 	    for (int i = 0; i < rcpt_number; i++)
 	    {
 		    FILE *rcptfp = NULL;
 		    char mail_path[1000];
 		    sprintf(mail_path, "../mailbox/%s/%s", rcpt_name[i], sendername);
-		    printf("mail_path: %s\n", mail_path);
+		    //printf("mail_path: %s\n", mail_path);
 		    rcptfp = fopen(mail_path, "wb"); 
 		    char read4_buf[25600];
 		    int read4 = SSL_read(ssl, read4_buf, sizeof(read4_buf));
-		    if(fwrite(read4_buf, 1, read4, rcptfp) != read4)
+		    if(fwrite(read4_buf, 1, read4, rcptfp) != (size_t)read4)
 		    {
 			    cout<<"fwrite for "<<rcpt_name[i]<<" failed"<<endl;
 		    }
+		    fclose(rcptfp);
 	    }
+	    //fclose(rcptfp);
+	    RSA_free(rsa);
     }
     else
     {
@@ -278,18 +335,27 @@ int main(int argc, char *argv[])
 	    recv_user[read2]  = '\0';
         printf("resv: %s\n", recv_user);
         //send encrpted message
-        char *test_msg = "hahaha";
+        const char *test_msg = "hahaha";
     	char encrypt_msg[2560];
     	auto rsa = EVP_PKEY_get1_RSA(pubkey);
     	int enc = RSA_public_encrypt(flen, (const unsigned char *)test_msg, (unsigned char *)encrypt_msg, rsa, padding);
     	//printf("%s\n", encrypt_msg);
+	if (enc == -1)
+	{
+		die("RSA_public_encrypt failed");
+	}
     	SSL_write(ssl, encrypt_msg, sizeof(encrypt_msg));
         // verify decrypted message
 	    char read3_buf[20];
 	    int read3 = SSL_read(ssl, read3_buf, sizeof(read3_buf));
-	    if (strncmp(test_msg, read3_buf, sizeof(test_msg)) != 0)
+	    if (read3 <= 0)
+	    {
+		    die("failed to  read decrypted message from the client");
+	    }
+	    if (strncmp(test_msg, read3_buf, sizeof(*test_msg)) != 0)
 	    {
 		    cout<<"wrong decrypted message, invalid user"<<endl;
+		    die("user does not have the correct private key");
 	    }
         else
         {
@@ -298,7 +364,7 @@ int main(int argc, char *argv[])
         
         //Not real implementation, just for testing
         char recv_path[1000];
-        sprintf(recv_path, "../mailbox/%s", recv_user);
+        //sprintf(recv_path, "../mailbox/%s", recv_user);
         DIR *d;
         struct dirent *dir;
         d = opendir(recv_path);
@@ -346,7 +412,7 @@ int main(int argc, char *argv[])
                     cout<<"fopen failed to open "<<msg_path<<endl;
                 }
                 fseek(fp_ver, 0, SEEK_END);
-                long size = ftell (fp_ver);
+                size_t size = ftell (fp_ver);
                 rewind(fp_ver);
                 char *buf = (char*) malloc (sizeof(char) * size);
                 if (buf == NULL)
@@ -364,9 +430,9 @@ int main(int argc, char *argv[])
             }
             closedir(d2);
         }
-        
+        RSA_free(rsa);
     }
-    
+    /*
     //generate encrypt_msg
     char *test_msg = "Pass Pass Pass Pass Pass";
     char encrypt_msg[2560];
@@ -374,6 +440,15 @@ int main(int argc, char *argv[])
     int enc = RSA_public_encrypt(flen, (const unsigned char *)test_msg, (unsigned char *)encrypt_msg, rsa, padding);
     printf("%s\n", encrypt_msg);
     SSL_write(ssl, encrypt_msg, sizeof(encrypt_msg));
+    */
+    BIO_free(bio);
+    SSL_free(ssl);
+    SSL_CTX_free(ctx);
+    X509_free(certificate);
+    //X509_free(selfCert);
+    EVP_PKEY_free(pubkey);
+    //EVP_PKEY_free(rsa);
+
     close(clientSock);
     return 0;
 }
