@@ -158,7 +158,7 @@ int main(int argc, char *argv[])
     BIO *bio;
     X509 *certificate;
     bio = BIO_new(BIO_s_mem());
-    BIO_puts(bio, buf);
+    BIO_write(bio, buf, count);
     certificate = PEM_read_bio_X509(bio, NULL, NULL, NULL);
     if (certificate == NULL)
     {
@@ -280,7 +280,7 @@ int main(int argc, char *argv[])
 	{
 		die("RSA_public_encrypt failed");
 	}
-    	SSL_write(ssl, encrypt_msg, sizeof(encrypt_msg));
+    	SSL_write(ssl, encrypt_msg, enc);
 
 	    // verify decrypted message
 	    char read3_buf[20];
@@ -347,7 +347,7 @@ int main(int argc, char *argv[])
 	{
 		die("RSA_public_encrypt failed");
 	}
-    	SSL_write(ssl, encrypt_msg, sizeof(encrypt_msg));
+    	SSL_write(ssl, encrypt_msg, enc);
         // verify decrypted message
 	    char read3_buf[20];
 	    int read3 = SSL_read(ssl, read3_buf, sizeof(read3_buf));
@@ -387,8 +387,8 @@ int main(int argc, char *argv[])
         }
         char num_msg[100];
         sprintf(num_msg, "%d", msg_num);
-        printf("msg_num_int: %d\n", msg_num);
-        printf("msg_num: %s\n", num_msg);
+        //printf("msg_num_int: %d\n", msg_num);
+        //printf("msg_num: %s\n", num_msg);
         SSL_write(ssl, num_msg, strlen(num_msg));
         
         DIR *d2;
