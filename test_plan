@@ -1,0 +1,56 @@
+Test plan & Test cases
+
+1. sendmsg on success
+
+    Testing command:
+        ./server 8888
+        ./sendmsg localhost 8888 addleness analects annalistic < ../input/00001
+    
+    result:
+        everything goes well. analects and annalistic successfully received the content in 00001 and stored the encrypted content in their mailbox.
+    
+2. recvmsg on success
+
+    Testing command:
+        ./server 8888
+        ./recvmsg localhost 8888 analects
+    
+    result:
+        everything goes well. the decrypted analects' mails appear in the bin file where you run recvmsg. in this case, it is the content of ./input/00001 sended by addleness
+    
+3. sendmsg with invalid username
+    
+    Testing command:
+        ./server 8888
+        ./sendmsg localhost 8888 abcdefg analects annalistic < ../input/00001
+        
+    result:
+        sendmesg exits with the error "wrong username"
+
+4. sendmsg with invalid recipients
+
+    Testing command:
+        ./server 8888
+        ./sendmsg localhost 8888 addleness abcd efgh < ../input/00001
+    
+    result:
+        sendmsg exits with the error "wrong recipient"
+        
+5. sendmsg with incorrect certificate
+    
+    Testing command:
+        ./server 8888
+        ./sendmsg localhost 8888 addleness analects annalistic < ../input/00001
+        (the certificate file provided by the client side is incorrect)
+    
+    result:
+        the server exits with the error "certificate does not match"
+
+6. sendmsg with large file
+    
+    Testing command:
+        ./server 8888
+        ./sendmsg localhost 8888 anthropomorphologically addleness < ../../hamlet.txt
+        
+    result:
+        sendmsg exits with error message "msg size > 2000 bytes"
