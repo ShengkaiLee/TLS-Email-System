@@ -181,6 +181,7 @@ int main(int argc, char **argv)
 	memcpy(&sin.sin_addr, (struct in_addr *)he->h_addr, he->h_length);
 	if (connect(sock, (struct sockaddr *)&sin, sizeof sin) < 0) {
 		perror("connect");
+		SSL_free(ssl);
 		return 2;
 	}
 
