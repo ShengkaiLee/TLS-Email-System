@@ -24,7 +24,7 @@ File Layout:
         1. ca:
                 Just Like HW2, this ca directory contains all the clients' certificates and private key.
         2. input:
-                This directory contains three test text files.
+                This directory contains four test text files.
         3. mailbox:
                 This directory can only be read/write by our 'server'. Every clients has its own subdirectories.
                 Those subdirectories are used to store intermediate messages pending to read.
