@@ -102,10 +102,30 @@ client: verify the signature on message
         exit if verify failed
 client: decrypted the message to current directory              server: delete message from mailbox
 
-3. Crucial security decisions and their rationale. The most important is how you divide a command into sandboxed and unsandboxed sections, and why:
+===============================================================================================================================
+Crucial security decisions and Sandbox:
+
+ we put the sendmsg and recvmsg into the sandboxed sections and leave the server unsandboxed. this means that the server has the highest privilege. 
+ we think the server should be able to access all certificates and the mailbox, which means basically everything in our project. 
+ Therefore, there is no reason to put the server into the sandbox section.
  
- we put the sendmsg and recvmsg into the sandboxed sections and leave the server unsandboxed. this means that the server has the highest privilege. we think the server should be able to access all certificates and the mailbox, which means basically everything in our project. Therefore, there is no reason to put the server into the sandbox section. For sendmsg and recvmsg, we limit the access of these two program in the ca directory because we don't want them to be able to access the root certificate or others' private key. the limitation of this is that the server program has highest permission. if someone can access the server program, he or she will be able to access other's mailbox and decrypted the message inside. but as I said, since the client and server are connecting using openssl, we assume the client can not directly access the server program and that's why we make this decision. 
+ For sendmsg and recvmsg, we limit the access of these two program in the 
+ ca directory because we don't want them to be able to access the root certificate or others' private key. The limitation of this is that the server 
+ program has highest permission. If someone can access the server program, he or she will be able to access other's mailbox and decrypted the message inside. 
+ but as I said, since the client and server are connecting using openssl, we assume the client can not directly access the server program and 
+ that's why we make this decision. 
+
  we use firejail to create the sandboxing. we do not use specific file permission because we believe we have everything covered in the sandboxed sections.
+ In the sandbox.sh, we set up `blacklist` for both sendmsg and recvmsg. Elements in `blacklist` are thoes files/directories cannot be access by client side.
+ To put these two excutables into sandbox, all you have to do is to call `sendmsg` or `recvmsg` with 'firejail`
+ For example: `firejail ./sendmsg localhost 8888 forfend repine`.
+              `firejail ./recvmsg localhost 8888 repine`.
+ Also, in the sandbox.sh, we assume that you install the `project` directory under $HOMW/Lee-Wang directory. If that's not the case, plase modify the 
+sandbox.sh respectively.
+
+Reference of Firejail:
+1. https://www.linux.com/topic/desktop/lock-your-untrusted-applications-firejail/
+2. https://linuxhint.com/install_firejail_ubuntu/
 ===============================================================================================================================
 
 Test plan & Test cases
