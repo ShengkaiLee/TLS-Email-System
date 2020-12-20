@@ -160,5 +160,45 @@ all test happens in ./Lee-Wang/project/bin
         
     result:
         the server exits with the error "certificate does not match"
+        
+9. block sendmsg's access to ca file
+    we want to proof our sandbox is working, so we block the access to the entire ca dir to see if sendmsg can run. we expect it faces "permission denied"
+    
+    Testing command:
+        echo "blacklist ${HOME}/Lee-Wang/project/ca" >> ~/.config/firejail/sendmsg.profile
+        ./server 8888
+        firejail ./sendmsg localhost 8888 neckar unrosed neckar  < ../input/00001
+        
+    result:
+        yw3472@instance-1:~/Lee-Wang/project/bin$ firejail ./sendmsg localhost 8888 neckar unrosed neckar  < ../input/00001
+        Reading profile /home/yw3472/.config/firejail/sendmsg.profile
+        Reading profile /etc/firejail/disable-common.inc
+        Reading profile /etc/firejail/disable-passwdmgr.inc
+        Reading profile /etc/firejail/disable-programs.inc
+        Warning: networking feature is disabled in Firejail configuration file
+        Parent pid 12199, child pid 12200
+        Child process initialized in 52.54 ms
+        lode Certificate or Keyfile failed: Permission denied
+        Parent is shutting down, bye...
+    
+10. block recvmsg's access to ca file
+    we want to proof our sandbox is working, so we block the access to the entire ca dir to see if recvmsg can run. we expect it faces "permission denied"
+    
+    Testing command:
+        echo "blacklist ${HOME}/Lee-Wang/project/ca" >> ~/.config/firejail/recvmsg.profile
+        ./server 8888
+        firejail ./recvmsg localhost 8888 analects
+        
+    result:
+        yw3472@instance-1:~/Lee-Wang/project/bin$ firejail ./recvmsg localhost 8888 analects
+        Reading profile /home/yw3472/.config/firejail/recvmsg.profile
+        Reading profile /etc/firejail/disable-common.inc
+        Reading profile /etc/firejail/disable-passwdmgr.inc
+        Reading profile /etc/firejail/disable-programs.inc
+        Warning: networking feature is disabled in Firejail configuration file
+        Parent pid 14118, child pid 14119
+        Child process initialized in 36.00 ms
+        lode Certificate or Keyfile failed: Permission denied
+        Parent is shutting down, bye...
 
 ===============================================================================================================================
