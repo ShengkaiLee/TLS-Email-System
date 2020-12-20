@@ -50,7 +50,7 @@ Test plan & Test cases
     
     Testing command:
         ./server 8888
-        ./sendmsg localhost 8888 anthropomorphologically addleness < ../../hamlet.txt
+        ./sendmsg localhost 8888 anthropomorphologically addleness < ../../hamlet
         
     result:
         sendmsg exits with error message "msg size > 2000 bytes"
