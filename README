@@ -75,6 +75,32 @@ recvmsg:
        repine0.txt, repine1.txt, repine2.txt. Each of them is decrpted and verified.
     4. If the recipient name is invalid, the `recvmsg` will report and error and 
        invalid.
+
+===============================================================================================================================
+Design Documents:
+
+Login in: The login part in similar for both `sendmsg` and `recvmsg`.
+1. The client side (user) sends certificates and their username to the server. Server uses the username to 
+find and load the certificates (server knows all the clients' certificates). Then, server call X509_cmp() to
+compare two certificates. If x509_cmp() returns false, the login in failed and server exits.
+
+2. If the certificates from the client is valid. Server encrypts a message (such as "test test") using client's
+certificates(public key) and send to client. Client needs to decrypt the message (using private key) to prove he/her 
+actually owns the certificate. If the client side cannot corretly decrpt the ciphter text, the login is failed and server exits.
+
+Sendmsg workflow: (for each recipient)
+client:  receive certificate                                    server: send recipient's certificates
+client:  generate public key from certificate                                       
+client:  encrypt the message
+client:  sign the encrpted message by priavte key
+client:  send message to server                                 server: receive message and write to corresponding directory
+
+Recvmsg workflow: (for each pending message)
+client: receive message                                         server: send message
+client: receive certificate                                     server: send sender's certificate
+client: verify the signature on message
+        exit if verify failed
+client: decrypted the message to current directory              server: delete message from mailbox
 ===============================================================================================================================
 
 Test plan & Test cases
@@ -202,3 +228,4 @@ all test happens in ./Lee-Wang/project/bin
         Parent is shutting down, bye...
 
 ===============================================================================================================================
+                          
