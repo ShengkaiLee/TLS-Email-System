@@ -182,6 +182,7 @@ int main(int argc, char **argv)
 	if (connect(sock, (struct sockaddr *)&sin, sizeof sin) < 0) {
 		perror("connect");
 		SSL_free(ssl);
+		SSL_CTX_free(ctx);
 		return 2;
 	}
 
