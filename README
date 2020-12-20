@@ -125,7 +125,7 @@ all test happens in ./Lee-Wang/project/bin
     Testing command:
         ./server 8888
         ./sendmsg localhost 8888 addleness analects annalistic < ../input/00001
-        (the certificate file provided by the client side is incorrect. has to manually change the code to alter the path of the incorrcet certificate)
+        (the certificate file provided by the client side is incorrect. has to manually change the code in sendmsg to the path of the incorrcet certificate)
     
     result:
         the server exits with the error "certificate does not match"
@@ -156,7 +156,7 @@ all test happens in ./Lee-Wang/project/bin
     Testing command:
         ./server 8888
         ./recvmsg localhost 8888 analects
-        (the certificate file provided by the client side is incorrect. has to manually change the code to alter the path of the incorrcet certificate)
+        (the certificate file provided by the client side is incorrect. has to manually change the code in recvmsg to the path of the incorrcet certificate)
         
     result:
         the server exits with the error "certificate does not match"
