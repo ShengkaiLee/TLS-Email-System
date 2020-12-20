@@ -7,11 +7,11 @@ cd project
 mkdir input
 mkdir bin
 cd ..
-cp 00001 project/input
-cp 00002 project/input
-cp 00003 project/input
-cp server project/bin
-cp sendmsg project/bin
-cp recvmsg project/bin
-cp signer.pem project/ca/intermediate/certs
-cp cacert.pem project/ca/intermediate/certs
+mv 00001 project/input
+mv 00002 project/input
+mv 00003 project/input
+mv server project/bin
+mv sendmsg project/bin
+mv recvmsg project/bin
+mv signer.pem project/ca/intermediate/certs
+mv cacert.pem project/ca/intermediate/certs

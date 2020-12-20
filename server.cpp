@@ -167,43 +167,7 @@ int main(int argc, char *argv[])
     {
         die("Cert is NULL");
     }
-    //char *line;
-    //line = X509_NAME_oneline(X509_get_subject_name(certificate), 0, 0);
-    //printf("Subject: %s\n", line);
-    //cout << "success" << endl;
-
-    
-    // verify clinet's cert
-    // 
-    //X509 *selfCert = SSL_get_certificate(ssl);
-    //X509* selfCert = NULL;
-    //FILE *cfp = NULL;
-    //cfp = fopen("../ca/intermediate/certs/www.addleness.com.cert.pem","rb");
-    //if(cfp == NULL)
-    //{
-        //selfCert = NULL;
-        //cout<<"cfp = NULL"<<endl;
-    //}
-    //else
-    //{
-        //selfCert = PEM_read_X509(cfp, NULL, NULL, NULL);
-        //cout << "selfCert" << endl;
-    //}
-    //fclose(cfp);
-    //cout << "selfCert" << endl;
     EVP_PKEY *pubkey = X509_get_pubkey(certificate);
-    //cout << "publicKey" << endl;
-    //int result = X509_verify(certificate, pubkey);
-    //cout << "result: " << result << endl;
-    //int result = X509_cmp(certificate, selfCert);
-    //cout << "result of X509_cmp: "<<result<<endl;
-    /*
-    if(result != 0)
-    {
-	    die("certificate does not match");
-    }
-    */
-
     char read1_buf[10];
     // read1 = function name
     int read1 = SSL_read(ssl, read1_buf, sizeof(read1_buf));
@@ -265,8 +229,6 @@ int main(int argc, char *argv[])
 		    if (token == NULL)
 			   break; 
 		    rcpt_name.push_back(token);
-		    //cout<<"token["<<rcpt_number<<"]: "<<token<<endl;
-		    //cout<<"rcpt_name: " << rcpt_name[rcpt_number] << endl;
 		    rcpt_number++;
 	    }
 		
@@ -301,14 +263,10 @@ int main(int argc, char *argv[])
 	    // send cert
 	    for (int i = 0; i < rcpt_number; i++)
 	    {
-            	    //FILE *rcptfp = NULL;
 		    char path[1000]; 
 		    sprintf(path, "../ca/intermediate/certs/www.%s.com.cert.pem", rcpt_name[i]);
-		    //printf("path: %s\n", path);
-		    //send_certificate(ssl, path);
 		    if(send_certificate(ssl, path) == 0)
 		    {
-			    //SSL_shutdown(ssl);
 			    die("error occurs. recipient does not exist");
 		    }
 	    }
@@ -400,8 +358,6 @@ int main(int argc, char *argv[])
         }
         char num_msg[100];
         sprintf(num_msg, "%d", msg_num);
-        //printf("msg_num_int: %d\n", msg_num);
-        //printf("msg_num: %s\n", num_msg);
         SSL_write(ssl, num_msg, strlen(num_msg));
         
         DIR *d2;
@@ -443,28 +399,17 @@ int main(int argc, char *argv[])
                 SSL_write(ssl, buf, size);
                 fclose(fp_ver);
                 free(buf);
+                remove(msg_path);
             }
             closedir(d2);
         }
-	//free(encrypt_msg);
         RSA_free(rsa);
     }
-    /*
-    //generate encrypt_msg
-    char *test_msg = "Pass Pass Pass Pass Pass";
-    char encrypt_msg[2560];
-    auto rsa = EVP_PKEY_get1_RSA(pubkey);
-    int enc = RSA_public_encrypt(flen, (const unsigned char *)test_msg, (unsigned char *)encrypt_msg, rsa, padding);
-    printf("%s\n", encrypt_msg);
-    SSL_write(ssl, encrypt_msg, sizeof(encrypt_msg));
-    */
     BIO_free(bio);
     SSL_free(ssl);
     SSL_CTX_free(ctx);
     X509_free(certificate);
-    //X509_free(selfCert);
     EVP_PKEY_free(pubkey);
-    //EVP_PKEY_free(rsa);
 
     close(clientSock);
     return 0;
