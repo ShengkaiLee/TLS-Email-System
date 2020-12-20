@@ -245,7 +245,7 @@ int main(int argc, char **argv)
 		}
 		if (!X509_STORE_add_cert(st, cacert))
 		{
-			die("add failed()\n");
+			die("add failed()");
 		}
 		//in = BIO_new_file("sign_out.txt","r");
 		char verBuf[25600];
@@ -254,21 +254,21 @@ int main(int argc, char **argv)
 		BIO_write(in, verBuf, verBytes + 1);
 		if (in == NULL)
 		{
-			die("in is NULL\n");
+			die("in is NULL");
 		}
 		cms = SMIME_read_CMS(in, &cont);
 		if (cms == NULL)
 		{
-			die("cms is NULL\n");
+			die("cms is NULL");
 		}
 		out = BIO_new_file("verify.txt", "w");
 		if(!CMS_verify(cms, NULL, st, cont, out, 0))
 		{
-			die("vertify failed\n");
+			die("vertify failed");
 		}
 		else
 		{
-			printf("verify success\n");
+			printf("verify success");
 		}
 		//decrypt msg
 		CMS_ContentInfo_free(cms);
@@ -302,9 +302,9 @@ int main(int argc, char **argv)
 		BIO_free(out_enc);
 		CMS_ContentInfo_free(cms_enc);
 		EVP_PKEY_free(rkey);
-                X509_free(rcert);
-                X509_STORE_free(st);
-                fclose(fp_key);
+        X509_free(rcert);
+        X509_STORE_free(st);
+        fclose(fp_key);
 	}
 	SSL_free(ssl);
 	SSL_CTX_free(ctx);;
