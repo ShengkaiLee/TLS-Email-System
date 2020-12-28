@@ -1,12 +1,3 @@
-Group Name: Lee & Wang
-Team Member1: Shengkai Li (sl4685)
-Team Member2: Yuanming Wang (yw3472)
-
-===============================================================================================================================
-Clarification:
-    Since our group only has two group members, Professor Steven has given us the permission to totally drop the functionalities of 
-    `getcert` and `changepw`. Therefore, in this project, we only implemented `sendmsg`, `recvmsg`, and `server`. Also, we wrote a 
-    bash script to generate all the clients' certificates.
 ===============================================================================================================================
 Enviornment Requirments:
     Before testing our program, please make sure you have install the following requirments:
